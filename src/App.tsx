@@ -1,8 +1,8 @@
 // App.tsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import { Layout } from "antd";
-import { HeartFilled } from "@ant-design/icons"; // Swapped Fire for a cozy Heart
+import { Layout, FloatButton } from "antd"; // Added FloatButton here
+import { HeartFilled, ArrowUpOutlined } from "@ant-design/icons"; // Added an arrow icon
 import MangaList from "./components/MangaList";
 import MangaReader from "./components/MangaReader";
 import MangaDetails from "./components/MangaDetails";
@@ -63,6 +63,16 @@ const App: React.FC = () => {
           Powered by MangaDex API © {new Date().getFullYear()} • Crafted with a
           cozy <HeartFilled style={{ color: "var(--accent-primary)" }} />
         </Footer>
+
+        {/* --- Back to Top Button --- */}
+        <FloatButton.BackTop
+          icon={<ArrowUpOutlined />}
+          type="primary"
+          style={{
+            right: 24,
+            bottom: 24,
+          }}
+        />
       </Layout>
     </Router>
   );

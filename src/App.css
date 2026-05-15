@@ -478,3 +478,11 @@ div {
     opacity: 0.6;
   }
 }
+
+.ant-btn-primary {
+  background: var(--accent-primary) !important;
+  border: none !important;
+  color: white !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 10px rgba(255, 140, 105, 0.3) !important;
+}

@@ -1,0 +1,242 @@
+@import url("https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap");
+
+:root {
+  --bg-dark: #fff8ee; /* Warm cozy cream */
+  --bg-card: #ffffff; /* Soft white for cards */
+  --accent-primary: #ff8c69; /* Warm peach/salmon */
+  --accent-secondary: #ffb347; /* Sunny yellow/orange */
+  --text-main: #5c4a3d; /* Warm dark brown */
+  --text-muted: #a68a76; /* Soft latte brown */
+  --card-shadow: 0 12px 24px -6px rgba(255, 140, 105, 0.15);
+}
+
+body {
+  font-family: "Comic Sans MS", "Comic Sans", "Comic Neue", cursive !important;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Force Ant Design to use our cozy font and colors */
+.ant-typography,
+.ant-btn,
+.ant-menu,
+.ant-card,
+.ant-list-item-meta-title,
+.ant-list-item-meta-description,
+span,
+div {
+  font-family: "Comic Sans MS", "Comic Sans", "Comic Neue", cursive !important;
+}
+
+.ant-layout {
+  background: transparent !important;
+}
+
+/* Custom Friendly Card Styling */
+.manga-card {
+  background: var(--bg-card) !important;
+  border: 4px solid transparent !important;
+  border-radius: 24px !important; /* Bubbly corners */
+  overflow: hidden;
+  box-shadow: var(--card-shadow) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.manga-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 30px -5px rgba(255, 140, 105, 0.25) !important;
+  border-color: var(--accent-primary) !important;
+}
+
+.manga-card .ant-card-body {
+  padding: 20px !important;
+}
+
+/* Gradient Text Magic */
+.gradient-text {
+  background: linear-gradient(to right, #ffffff, #ffe4d6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Reader Glass Header - Warmer version */
+.glass-header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: rgba(255, 248, 238, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 50;
+  padding: 15px 24px;
+  display: flex;
+  align-items: center;
+  border-bottom: 2px dashed rgba(255, 140, 105, 0.3);
+}
+
+/* Smooth Image Loading */
+.manga-page {
+  box-shadow: 0 10px 20px rgba(92, 74, 61, 0.1);
+  border-radius: 16px;
+  transition: opacity 0.5s ease-in-out;
+}
+
+/* --- Refactored Grid & Cover Images --- */
+.dashboard-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  gap: 16px;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: var(--card-shadow);
+}
+
+.action-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.search-bar {
+  width: 250px;
+}
+.search-bar input {
+  border-radius: 16px !important;
+}
+
+@media (max-width: 576px) {
+  .search-bar {
+    width: 100%;
+  }
+  .action-bar {
+    width: 100%;
+  }
+}
+
+.refresh-btn {
+  background: var(--accent-primary);
+  border: none;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(255, 140, 105, 0.3);
+}
+.refresh-btn:hover {
+  background: var(--accent-secondary) !important;
+  color: white !important;
+}
+
+/* Vertical Manga Card Overrides */
+.manga-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.manga-card .ant-card-body {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Cover Image Styling */
+.cover-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 145%;
+  overflow: hidden;
+  background-color: #ffe4d6;
+}
+
+.manga-cover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.manga-card:hover .manga-cover {
+  transform: scale(1.08) rotate(1deg); /* Friendly little tilt */
+}
+
+.manga-cover-fallback {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffe4d6;
+  color: var(--accent-primary);
+}
+
+/* Chapter Overlays & Buttons */
+.chapter-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--accent-secondary);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 13px;
+  z-index: 2;
+  box-shadow: 0 4px 8px rgba(255, 179, 71, 0.4);
+  border: 2px solid white;
+}
+
+.meta-text {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+}
+
+.read-btn {
+  background: #fff0e5 !important;
+  color: var(--accent-primary) !important;
+  border-color: #ffe4d6 !important;
+  border-radius: 16px;
+  font-weight: 700;
+  box-shadow: none !important;
+}
+
+.read-btn:hover {
+  background: #ffe4d6 !important;
+  color: var(--accent-primary) !important;
+  transform: translateY(-2px);
+}
+
+.gradient-btn {
+  background: linear-gradient(
+    135deg,
+    var(--accent-primary),
+    var(--accent-secondary)
+  ) !important;
+  color: white !important;
+  border: none !important;
+}
+.gradient-btn:hover {
+  color: white !important;
+  box-shadow: 0 6px 12px rgba(255, 140, 105, 0.4) !important;
+}

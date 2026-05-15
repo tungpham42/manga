@@ -1,25 +1,41 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { Spin, Button, Result } from "antd";
-import { ArrowLeftOutlined } from "@ant-design/icons";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { Spin, Button, Result, Space } from "antd";
+import {
+  ArrowLeftOutlined,
+  LeftOutlined,
+  RightOutlined,
+} from "@ant-design/icons";
 import api from "../api";
 
 const MangaReader: React.FC = () => {
   const { chapterId } = useParams<{ chapterId: string }>();
+  const navigate = useNavigate();
+
   const [images, setImages] = useState<string[]>([]);
   const [mangaId, setMangaId] = useState<string | null>(null);
   const [mangaTitle, setMangaTitle] = useState<string | null>(null);
+
+  // Navigation states
+  const [prevChapterId, setPrevChapterId] = useState<string | null>(null);
+  const [nextChapterId, setNextChapterId] = useState<string | null>(null);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   useEffect(() => {
     const fetchChapterData = async () => {
+      setLoading(true);
+      setError(false);
+      setPrevChapterId(null);
+      setNextChapterId(null);
+
       try {
-        // Fetch both the page images and the chapter metadata (including parent manga details)
+        // Fetch both the page images and the chapter metadata
         const [atHomeRes, chapterRes] = await Promise.all([
           api.get(`/at-home/server/${chapterId}`),
           api.get(`/chapter/${chapterId}`, {
-            params: { "includes[]": ["manga"] }, // <-- This tells the API to give us the parent manga info!
+            params: { "includes[]": ["manga"] },
           }),
         ]);
 
@@ -37,18 +53,51 @@ const MangaReader: React.FC = () => {
         );
 
         if (mangaRel) {
-          setMangaId(mangaRel.id);
+          const fetchedMangaId = mangaRel.id;
+          setMangaId(fetchedMangaId);
+
           const titleObj = mangaRel.attributes?.title;
           const title =
             titleObj?.en ||
             (titleObj ? Object.values(titleObj)[0] : "Unknown Manga");
           setMangaTitle(title as string);
+
+          // 3. Fetch chapter feed to figure out Next / Previous chapters
+          const feedRes = await api.get(`/manga/${fetchedMangaId}/feed`, {
+            params: {
+              limit: 500,
+              translatedLanguage: ["en"],
+              "order[chapter]": "asc", // Ascending order to easily find prev/next
+              includeFuturePublishAt: 0,
+              includeEmptyPages: 0,
+              includeExternalUrl: 0,
+            },
+          });
+
+          const validChapters = feedRes.data.data.filter(
+            (item: any) =>
+              !item.attributes.externalUrl && item.attributes.pages > 0,
+          );
+
+          // Find current chapter index to set neighbors
+          const currentIndex = validChapters.findIndex(
+            (c: any) => c.id === chapterId,
+          );
+
+          if (currentIndex > 0) {
+            setPrevChapterId(validChapters[currentIndex - 1].id);
+          }
+          if (currentIndex !== -1 && currentIndex < validChapters.length - 1) {
+            setNextChapterId(validChapters[currentIndex + 1].id);
+          }
         }
       } catch (err) {
         console.error("Failed to load chapter data", err);
         setError(true);
       } finally {
         setLoading(false);
+        // Scroll to the top when navigating between chapters
+        window.scrollTo({ top: 0, behavior: "smooth" });
       }
     };
 
@@ -123,23 +172,64 @@ const MangaReader: React.FC = () => {
       />
     );
 
+  // Reusable component for the Next/Prev buttons
+  const ChapterNavigation = () => (
+    <Space style={{ margin: "20px 0" }} size="middle">
+      <Button
+        type="primary"
+        shape="round"
+        icon={<LeftOutlined />}
+        disabled={!prevChapterId}
+        onClick={() => prevChapterId && navigate(`/read/${prevChapterId}`)}
+        style={{
+          background: prevChapterId ? "var(--accent-primary)" : undefined,
+          border: "none",
+          fontWeight: "bold",
+          boxShadow: prevChapterId
+            ? "0 4px 10px rgba(255, 140, 105, 0.3)"
+            : "none",
+        }}
+      >
+        Previous Chapter
+      </Button>
+
+      <Button
+        type="primary"
+        shape="round"
+        disabled={!nextChapterId}
+        onClick={() => nextChapterId && navigate(`/read/${nextChapterId}`)}
+        style={{
+          background: nextChapterId ? "var(--accent-primary)" : undefined,
+          border: "none",
+          fontWeight: "bold",
+          boxShadow: nextChapterId
+            ? "0 4px 10px rgba(255, 140, 105, 0.3)"
+            : "none",
+        }}
+      >
+        Next Chapter <RightOutlined />
+      </Button>
+    </Space>
+  );
+
   return (
     <div
       style={{
-        background: "var(--bg-dark)" /* Soft cream background */,
+        background: "var(--bg-dark)",
         minHeight: "100vh",
         margin: "-40px -20px",
         position: "relative",
       }}
     >
-      {mangaId && mangaTitle && (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            padding: "24px 0",
-          }}
-        >
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          padding: "24px 0 0 0",
+        }}
+      >
+        {mangaId && mangaTitle && (
           <Link
             to={`/manga/${mangaId}`}
             className="catchy-back-link"
@@ -154,17 +244,21 @@ const MangaReader: React.FC = () => {
               alignItems: "center",
               gap: "10px",
               padding: "12px 28px",
-              borderRadius: "30px", // High border-radius for a perfect pill shape
+              borderRadius: "30px",
               boxShadow: "0 8px 20px rgba(255, 140, 105, 0.35)",
               transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
               zIndex: 10,
+              marginBottom: "10px",
             }}
           >
             <ArrowLeftOutlined style={{ fontSize: "18px" }} /> Back to{" "}
             {mangaTitle}
           </Link>
-        </div>
-      )}
+        )}
+
+        {/* Top Navigation */}
+        <ChapterNavigation />
+      </div>
 
       {/* Pages Container */}
       <div
@@ -172,8 +266,8 @@ const MangaReader: React.FC = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          paddingTop: "50px",
-          paddingBottom: "50px",
+          paddingTop: "20px",
+          paddingBottom: "20px",
           gap: "12px",
         }}
       >
@@ -187,11 +281,22 @@ const MangaReader: React.FC = () => {
               maxWidth: "100%",
               width: "800px",
               objectFit: "contain",
-              backgroundColor: "#FFF0E5", // Cozy placeholder
+              backgroundColor: "#FFF0E5",
             }}
             loading="lazy"
           />
         ))}
+      </div>
+
+      {/* Bottom Navigation */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          paddingBottom: "40px",
+        }}
+      >
+        <ChapterNavigation />
       </div>
     </div>
   );

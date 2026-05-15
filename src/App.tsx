@@ -61,7 +61,7 @@ const App: React.FC = () => {
           }}
         >
           Powered by MangaDex API © {new Date().getFullYear()} • Crafted with a
-          cozy ♥
+          cozy <HeartFilled style={{ color: "var(--accent-primary)" }} />
         </Footer>
       </Layout>
     </Router>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Spin, Button, Result } from "antd";
-import { HomeOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined } from "@ant-design/icons";
 import api from "../api";
 
 const MangaReader: React.FC = () => {
@@ -132,58 +132,39 @@ const MangaReader: React.FC = () => {
         position: "relative",
       }}
     >
-      {/* Floating Glass Header with Breadcrumb Navigation */}
-      <div className="glass-header" style={{ justifyContent: "space-between" }}>
-        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-          <Link to="/">
-            <Button
-              type="text"
-              icon={<HomeOutlined />}
-              style={{
-                color: "var(--text-muted)",
-                fontWeight: 700,
-                display: "flex",
-                alignItems: "center",
-                fontSize: "16px",
-              }}
-            >
-              Dashboard
-            </Button>
-          </Link>
-
-          {/* This is the new Parent Manga Link */}
-          {mangaId && mangaTitle && (
-            <>
-              <span style={{ color: "var(--text-muted)", fontWeight: 800 }}>
-                /
-              </span>
-              <Link to={`/manga/${mangaId}`}>
-                <Button
-                  type="text"
-                  style={{
-                    color: "var(--accent-primary)",
-                    fontWeight: 800,
-                    fontSize: "16px",
-                    padding: "0 8px",
-                  }}
-                >
-                  {mangaTitle}
-                </Button>
-              </Link>
-            </>
-          )}
-        </div>
-
+      {mangaId && mangaTitle && (
         <div
           style={{
-            color: "var(--text-muted)",
-            fontWeight: 700,
-            fontSize: "16px",
+            display: "flex",
+            justifyContent: "center",
+            padding: "24px 0",
           }}
         >
-          {images.length} Pages
+          <Link
+            to={`/manga/${mangaId}`}
+            className="catchy-back-link"
+            style={{
+              background:
+                "linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))",
+              color: "#ffffff",
+              fontWeight: 800,
+              fontSize: "16px",
+              textDecoration: "none",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "10px",
+              padding: "12px 28px",
+              borderRadius: "30px", // High border-radius for a perfect pill shape
+              boxShadow: "0 8px 20px rgba(255, 140, 105, 0.35)",
+              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+              zIndex: 10,
+            }}
+          >
+            <ArrowLeftOutlined style={{ fontSize: "18px" }} /> Back to{" "}
+            {mangaTitle}
+          </Link>
         </div>
-      </div>
+      )}
 
       {/* Pages Container */}
       <div
@@ -191,8 +172,8 @@ const MangaReader: React.FC = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          paddingTop: "100px",
-          paddingBottom: "100px",
+          paddingTop: "50px",
+          paddingBottom: "50px",
           gap: "12px",
         }}
       >

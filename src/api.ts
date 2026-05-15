@@ -1,42 +1,22 @@
 import axios from "axios";
 
-const CLIENT_ID = process.env.REACT_APP_CLIENT_ID || "";
-const CLIENT_SECRET = process.env.REACT_APP_CLIENT_SECRET || "";
-
-// Base Axios instance
+// Point to the Netlify Function we just created
 const api = axios.create({
-  baseURL: "https://api.mangadex.org",
+  baseURL: "/.netlify/functions/mangadex",
 });
 
-let accessToken: string | null = null;
+// Intercept all requests to neatly pass the path as the "endpoint" parameter
+api.interceptors.request.use((config) => {
+  const originalUrl = config.url || "";
 
-// OAuth2 Client Credentials Flow
-const authenticate = async () => {
-  if (accessToken) return accessToken;
-  try {
-    const params = new URLSearchParams();
-    params.append("grant_type", "client_credentials");
-    params.append("client_id", CLIENT_ID);
-    params.append("client_secret", CLIENT_SECRET);
-
-    const response = await axios.post(
-      "https://auth.mangadex.org/realms/mangadex/protocol/openid-connect/token",
-      params,
-      { headers: { "Content-Type": "application/x-www-form-urlencoded" } },
-    );
-    accessToken = response.data.access_token;
-    return accessToken;
-  } catch (error) {
-    console.error("MangaDex Auth Error:", error);
-    return null;
-  }
-};
-
-// Request Interceptor to inject token
-api.interceptors.request.use(async (config) => {
-  const token = await authenticate();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  // Ensure it's a relative API path (e.g. "/chapter")
+  if (!originalUrl.startsWith("http")) {
+    config.params = {
+      ...config.params,
+      endpoint: originalUrl,
+    };
+    // Clear url so Axios only resolves to the baseURL
+    config.url = "";
   }
   return config;
 });

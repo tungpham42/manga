@@ -170,7 +170,7 @@ const MangaDetails: React.FC = () => {
             itemLayout="horizontal"
             dataSource={chapters}
             pagination={{
-              pageSize: 20,
+              pageSize: 30,
               style: { textAlign: "center", marginTop: 24 },
             }}
             renderItem={(chapter) => (
